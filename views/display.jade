@@ -1,6 +1,14 @@
 !!!5
 html(lang="en")
-  head
-    title
-  body
-    h1= modelName
+	head
+		title BABYLON VIEWER
+		script. (type='text/javascript')
+			var folder = "#{folder}";
+			var model = "#{model}";
+		script(src='/js/babylon.1.6.0.js')
+		script(src='/js/initScene.js')
+		link(href='/css/style.css', rel='stylesheet')
+	body
+		canvas#renderCanvas
+		#fps
+		#stats

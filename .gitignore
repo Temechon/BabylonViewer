@@ -214,4 +214,6 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
+#babylonviewer specific
 node_modules
+tmp
