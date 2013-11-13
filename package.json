@@ -1,0 +1,19 @@
+{
+  "name": "babylonViewer",
+  "subdomain": "babylonviewer",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "start": "app.js"
+  },
+  "version": "0.0.1-2",
+  "description": "A web app to visualize a .babylon file",
+  "main": "app.js",
+  "author": "Julian Chenard <j.chenard@sokrate.fr>",
+  "dependencies": {
+    "adm-zip": "0.4.x",
+    "express": "3.4.x",
+    "jade": "0.35.x"
+  }
+}

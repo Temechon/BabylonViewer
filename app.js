@@ -76,4 +76,5 @@ var findBabylonFile = function (folderPath) {
     
 };
 
-app.listen(process.env.PORT);
+app.listen(80);
+console.log("Running on port "+80);
