@@ -35,6 +35,9 @@ var onload = function () {
                 scene.executeWhenReady(function () {
 					// If no default camera
                     if (! scene.activeCamera) {
+						
+						scene.clearColor = new BABYLON.Color3(192,190,187);
+					
 						// Get the first mesh
 						var radius = -1;
 

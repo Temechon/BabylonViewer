@@ -1,13 +1,19 @@
 var express = require("express");
-var app = express();
-
-
-var folderName = "";
+// Zip 
 var AdmZip = require('adm-zip');
 var path = require('path');
 
+// Include the file module
+var fs = require('fs');
 
-/// Include the express body parser
+var app = express();
+
+// The tmp folder name where the user zip file will be unzipped
+var folderName = "";
+
+
+// Include the express body parser
+// And the Jade template engine
 app.configure(function () {
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -16,64 +22,65 @@ app.configure(function () {
 
 // Everything in public will be accessible from '/'
 app.use(express.static(path.join(__dirname, 'public')));
+// Everything in tmp should be accessible as well.
 app.use('/tmp', express.static(__dirname + '/tmp'));
 
-
-var form = "<!DOCTYPE HTML><html><body>" +
-"<form method='post' action='/upload' enctype='multipart/form-data'>" +
-"<input type='file' name='image'/>" +
-"<input type='submit' /></form>" +
-"</body></html>";
-
+// Index page
 app.get('/', function (req, res){
-	res.writeHead(200, {'Content-Type': 'text/html' });
-	res.end(form);	
-	/*res.render('index',
-    { title : 'Home' }
-    );*/
-	
+	res.render('index',{});
 });
 
-/// Include the file module
-var fs = require('fs');
+// Error page
+app.get('/error', function (req, res){
+	res.render('error',{});
+});
 
-/// Post files
+// Upload form action
 app.post('/upload', function(req, res) {
 
 	fs.readFile(req.files.image.path, function (err, data) {
 
 		var fileName = req.files.image.name;
 
-		/// If there's an error
+		// If there's an error, redirect to error page
 		if(!fileName){
-
-			console.log("There was an error")
-			res.redirect("/");
-			res.end();
+			console.log("There was an error : filename empty");
+			res.render('index',{error:"Cannot create folder"});
 
 		} else {
-			// Create a directory
+			// Create a directory in tmp folder
 			folderName = new Date().getTime();
 			fs.mkdir("./tmp/"+folderName, function (err) {
-			if (err){
-				console.log(err);
-			} else {
-				var folderPath = "./tmp/"+folderName;
-				var newPath = folderPath+"/"+ fileName;
+				if (err){
+					// If cannot create tmp folder, log error and redirect to error page
+					console.log(err);
+					res.render('index',{error:"Cannot create tmp folder"});
+				} else {
+					// The folder path in the tmp folder
+					var folderPath = "./tmp/"+folderName;
+					// The output path of the uploaded zip file
+					var newPath = folderPath+"/"+ fileName;
 
-				// write file to uploads/fullsize folder
-				fs.writeFile(newPath, data, function (err) {
-					// Unzip the file in the current folder
-					unzipFile(newPath);
-					var modelName = findBabylonFile(folderPath);
-					//if (modelName) {						
-						// let's see it;
-						res.render('display',{model:modelName, folder:folderName});
-					//} else {
-					//	res.render('nothingFound');
-					//}
-				});
-			}
+					// Write file to output folder
+					fs.writeFile(newPath, data, function (err) {
+						if (err){
+							// If cannot write in tmp folder, log error and redirect to error page
+							console.log(err);
+							res.render('index',{error:"Cannot write zip file in tmp folder"});
+						} else {
+							// Unzip the file in the tmp folder
+							unzipFile(newPath);
+							// Get the model name
+							var modelName = findBabylonFile(folderPath);
+							if (modelName) {						
+								// let's see it;
+								res.render('display',{model:modelName, folder:folderName});
+							} else {
+								res.render('index',{error:"The babylon file cannot be found"});
+							}
+						}
+					});
+				}
 
             });
 		}
